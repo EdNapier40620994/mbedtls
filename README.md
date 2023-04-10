@@ -1,3 +1,9 @@
+# Version of MBEDTLS modified for Applied Cryptography and Trust Coursework
+
+This repository contains any specific changes needed to the Mbed TLS library needed to support evaluation of lightweight cryptography methods.
+
+-----------------------------
+
 README for Mbed TLS
 ===================
 
