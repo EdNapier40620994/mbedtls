@@ -67,6 +67,12 @@
 
 static int supported_init = 0;
 
+extern void trace_aead_encrypt_entry(void);
+extern void trace_aead_encrypt_exit(void);
+extern void trace_aead_decrypt_entry(void);
+extern void trace_aead_decrypt_exit(void);
+
+
 const int *mbedtls_cipher_list(void)
 {
     const mbedtls_cipher_definition_t *def;
@@ -1521,9 +1527,11 @@ int mbedtls_cipher_auth_encrypt_ext(mbedtls_cipher_context_t *ctx,
         return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
     }
 
+    trace_aead_encrypt_entry();
     int ret = mbedtls_cipher_aead_encrypt(ctx, iv, iv_len, ad, ad_len,
                                           input, ilen, output, olen,
                                           output + ilen, tag_len);
+    trace_aead_encrypt_exit();
     *olen += tag_len;
     return ret;
 #else
@@ -1571,9 +1579,14 @@ int mbedtls_cipher_auth_decrypt_ext(mbedtls_cipher_context_t *ctx,
         return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
     }
 
-    return mbedtls_cipher_aead_decrypt(ctx, iv, iv_len, ad, ad_len,
-                                       input, ilen - tag_len, output, olen,
-                                       input + ilen - tag_len, tag_len);
+    trace_aead_decrypt_entry();
+
+    int rc =  mbedtls_cipher_aead_decrypt(ctx, iv, iv_len, ad, ad_len,
+                                    input, ilen - tag_len, output, olen,
+                                    input + ilen - tag_len, tag_len);
+
+    trace_aead_decrypt_exit();
+    return rc;                                 
 #else
     return MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE;
 #endif /* MBEDTLS_CIPHER_MODE_AEAD */
