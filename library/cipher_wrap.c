@@ -68,6 +68,8 @@
 #include <string.h>
 #endif
 
+#include "my_mbedtls_ascon_wrap.h"
+
 #include "mbedtls/platform.h"
 
 #if defined(MBEDTLS_GCM_C)
@@ -2125,6 +2127,76 @@ static const mbedtls_cipher_info_t aes_256_nist_kwp_info = {
 };
 #endif /* MBEDTLS_NIST_KW_C */
 
+static void * ascon_ctx_alloc(void)
+{
+    void *ctx = mbedtls_calloc(1, sizeof(my_mbedtls_ascon_context));
+
+    if (ctx != NULL) {
+        my_mbedtls_ascon_init(ctx);
+    }
+
+    return ctx;
+}
+
+static void ascon_ctx_free(void *ctx)
+{
+    my_mbedtls_ascon_free(ctx);
+    mbedtls_free(ctx);
+}
+
+static int ascon_setkey_wrap(void *ctx, const unsigned char *key,
+                              unsigned int key_bitlen)
+{
+    if (key_bitlen != ASCON_AEAD128_KEY_LEN) {
+        return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
+    }
+
+    if (0 != my_mbedtls_ascon_setkey((my_mbedtls_ascon_context *) ctx, key)) {
+        return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
+    }
+
+    return 0;
+}
+
+static const mbedtls_cipher_base_t ascon_base_info = {
+    MBEDTLS_CIPHER_ID_ASCON,
+    NULL,
+#if defined(MBEDTLS_CIPHER_MODE_CBC)
+    NULL,
+#endif
+#if defined(MBEDTLS_CIPHER_MODE_CFB)
+    NULL,
+#endif
+#if defined(MBEDTLS_CIPHER_MODE_OFB)
+    NULL,
+#endif
+#if defined(MBEDTLS_CIPHER_MODE_CTR)
+    NULL,
+#endif
+#if defined(MBEDTLS_CIPHER_MODE_XTS)
+    NULL,
+#endif
+#if defined(MBEDTLS_CIPHER_MODE_STREAM)
+    NULL,
+#endif
+    ascon_setkey_wrap,
+    ascon_setkey_wrap,
+    ascon_ctx_alloc,
+    ascon_ctx_free,
+};
+
+
+static const mbedtls_cipher_info_t ascon_info = {
+    MBEDTLS_CIPHER_ASCON,
+    MBEDTLS_MODE_STREAM,
+    128,
+    "ASCON",
+    ASCON_AEAD_NONCE_LEN,
+    0,
+    1,
+    &ascon_base_info
+};
+
 const mbedtls_cipher_definition_t mbedtls_cipher_definitions[] =
 {
 #if defined(MBEDTLS_AES_C)
@@ -2269,6 +2341,8 @@ const mbedtls_cipher_definition_t mbedtls_cipher_definitions[] =
 #if defined(MBEDTLS_CIPHER_NULL_CIPHER)
     { MBEDTLS_CIPHER_NULL,                 &null_cipher_info },
 #endif /* MBEDTLS_CIPHER_NULL_CIPHER */
+
+    { MBEDTLS_CIPHER_ASCON,         &ascon_info },
 
     { MBEDTLS_CIPHER_NONE, NULL }
 };

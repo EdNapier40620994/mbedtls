@@ -65,6 +65,9 @@
 
 #include "mbedtls/platform.h"
 
+#include "my_mbedtls_ascon_wrap.h"
+
+
 static int supported_init = 0;
 
 extern void trace_aead_encrypt_entry(void);
@@ -1380,6 +1383,18 @@ static int mbedtls_cipher_aead_encrypt(mbedtls_cipher_context_t *ctx,
     }
 #endif /* MBEDTLS_CHACHAPOLY_C */
 
+    if (MBEDTLS_CIPHER_ASCON == ctx->cipher_info->type) {
+        /* ASCON has fixed length nonce and MAC (tag) */
+        if ((iv_len != ctx->cipher_info->iv_size) ||
+            (tag_len != ASCON_AEAD_TAG_MIN_SECURE_LEN)) {
+            return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
+        }
+
+        *olen = ilen;
+        return my_mbedtls_ascon_encrypt_and_tag(ctx->cipher_ctx,
+                                                  ilen, iv, ad, ad_len, input, output, tag);
+    }
+
     return MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE;
 }
 
@@ -1481,6 +1496,29 @@ static int mbedtls_cipher_aead_decrypt(mbedtls_cipher_context_t *ctx,
         return ret;
     }
 #endif /* MBEDTLS_CHACHAPOLY_C */
+
+    if (MBEDTLS_CIPHER_ASCON == ctx->cipher_info->type) {
+        int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
+
+        /* ASCON has fixed length nonce and MAC (tag) */
+        if ((iv_len != ctx->cipher_info->iv_size) ||
+            (tag_len != ASCON_AEAD_TAG_MIN_SECURE_LEN)) {
+            return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
+        }
+
+        *olen = ilen;
+        ret = my_mbedtls_ascon_auth_decrypt(ctx->cipher_ctx, ilen,
+                                               iv, ad, ad_len, tag, input, output);
+
+        if (ret == MBEDTLS_ERR_CHACHAPOLY_AUTH_FAILED) {
+             ret = MBEDTLS_ERR_CIPHER_AUTH_FAILED;
+        }
+
+        return ret;
+    }
+
+
+
 
     return MBEDTLS_ERR_CIPHER_FEATURE_UNAVAILABLE;
 }

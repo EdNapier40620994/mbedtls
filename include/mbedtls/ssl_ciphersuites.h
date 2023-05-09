@@ -263,6 +263,10 @@ extern "C" {
 #define MBEDTLS_TLS1_3_AES_128_CCM_SHA256                     0x1304 /**< TLS 1.3 */
 #define MBEDTLS_TLS1_3_AES_128_CCM_8_SHA256                   0x1305 /**< TLS 1.3 */
 
+#define MBEDTLS_TLS_ECDHE_ECDSA_WITH_ASCON_SHA256             0xD001 
+
+
+
 /* Reminder: update mbedtls_ssl_premaster_secret when adding a new key exchange.
  * Reminder: update MBEDTLS_KEY_EXCHANGE__xxx below
  */
