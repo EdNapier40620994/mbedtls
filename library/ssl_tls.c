@@ -8394,28 +8394,38 @@ static int ssl_tls12_populate_transform(mbedtls_ssl_transform *transform,
         transform->maclen = 0;
         mac_key_len = 0;
 
-        /* All modes haves 96-bit IVs, but the length of the static parts vary
-         * with mode and version:
-         * - For GCM and CCM in TLS 1.2, there's a static IV of 4 Bytes
-         *   (to be concatenated with a dynamically chosen IV of 8 Bytes)
-         * - For ChaChaPoly in TLS 1.2, and all modes in TLS 1.3, there's
-         *   a static IV of 12 Bytes (to be XOR'ed with the 8 Byte record
-         *   sequence number).
-         */
-        transform->ivlen = 12;
+        int is_ascon = (mbedtls_cipher_info_get_mode(cipher_info)
+                         == MBEDTLS_MODE_ASCON);
+        if (is_ascon)
+        {
+            transform->ivlen = 16;
+            transform->fixed_ivlen = 16;
+        }
+        else
+        {
+            /* All modes haves 96-bit IVs, but the length of the static parts vary
+            * with mode and version:
+            * - For GCM and CCM in TLS 1.2, there's a static IV of 4 Bytes
+            *   (to be concatenated with a dynamically chosen IV of 8 Bytes)
+            * - For ChaChaPoly in TLS 1.2, and all modes in TLS 1.3, there's
+            *   a static IV of 12 Bytes (to be XOR'ed with the 8 Byte record
+            *   sequence number).
+            */
+            transform->ivlen = 12;
 
-        int is_chachapoly = 0;
-#if defined(MBEDTLS_USE_PSA_CRYPTO)
-        is_chachapoly = (key_type == PSA_KEY_TYPE_CHACHA20);
-#else
-        is_chachapoly = (mbedtls_cipher_info_get_mode(cipher_info)
-                         == MBEDTLS_MODE_CHACHAPOLY);
-#endif /* MBEDTLS_USE_PSA_CRYPTO */
+            int is_chachapoly = 0;
+    #if defined(MBEDTLS_USE_PSA_CRYPTO)
+            is_chachapoly = (key_type == PSA_KEY_TYPE_CHACHA20);
+    #else
+            is_chachapoly = (mbedtls_cipher_info_get_mode(cipher_info)
+                            == MBEDTLS_MODE_CHACHAPOLY);
+    #endif /* MBEDTLS_USE_PSA_CRYPTO */
 
-        if (is_chachapoly) {
-            transform->fixed_ivlen = 12;
-        } else {
-            transform->fixed_ivlen = 4;
+            if (is_chachapoly) {
+                transform->fixed_ivlen = 12;
+            } else {
+                transform->fixed_ivlen = 4;
+            }
         }
 
         /* Minimum length of encrypted record */
