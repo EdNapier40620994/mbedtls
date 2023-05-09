@@ -2147,7 +2147,7 @@ static void ascon_ctx_free(void *ctx)
 static int ascon_setkey_wrap(void *ctx, const unsigned char *key,
                               unsigned int key_bitlen)
 {
-    if (key_bitlen != ASCON_AEAD128_KEY_LEN) {
+    if (key_bitlen != 128) {
         return MBEDTLS_ERR_CIPHER_BAD_INPUT_DATA;
     }
 
