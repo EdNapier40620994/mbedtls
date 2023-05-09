@@ -2380,7 +2380,8 @@ static mbedtls_ssl_mode_t mbedtls_ssl_get_base_mode(
     defined(MBEDTLS_CHACHAPOLY_C)
     if (mode == MBEDTLS_MODE_GCM ||
         mode == MBEDTLS_MODE_CCM ||
-        mode == MBEDTLS_MODE_CHACHAPOLY) {
+        mode == MBEDTLS_MODE_CHACHAPOLY ||
+        mode == MBEDTLS_MODE_ASCON) {
         return MBEDTLS_SSL_MODE_AEAD;
     }
 #endif /* MBEDTLS_GCM_C || MBEDTLS_CCM_C || MBEDTLS_CHACHAPOLY_C */

@@ -2188,7 +2188,7 @@ static const mbedtls_cipher_base_t ascon_base_info = {
 
 static const mbedtls_cipher_info_t ascon_info = {
     MBEDTLS_CIPHER_ASCON,
-    MBEDTLS_MODE_STREAM,
+    MBEDTLS_MODE_ASCON,
     128,
     "ASCON",
     ASCON_AEAD_NONCE_LEN,

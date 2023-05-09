@@ -198,6 +198,7 @@ typedef enum {
     MBEDTLS_MODE_CHACHAPOLY,             /**< The ChaCha-Poly cipher mode. */
     MBEDTLS_MODE_KW,                     /**< The SP800-38F KW mode */
     MBEDTLS_MODE_KWP,                    /**< The SP800-38F KWP mode */
+    MBEDTLS_MODE_ASCON
 } mbedtls_cipher_mode_t;
 
 /** Supported cipher padding types. */
