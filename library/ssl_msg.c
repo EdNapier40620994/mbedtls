@@ -631,7 +631,8 @@ static void ssl_extract_add_data_from_record(unsigned char *add_data,
 
 #if defined(MBEDTLS_GCM_C) || \
     defined(MBEDTLS_CCM_C) || \
-    defined(MBEDTLS_CHACHAPOLY_C)
+    defined(MBEDTLS_CHACHAPOLY_C) || \
+    defined(MBEDTLS_ASCON_C)
 MBEDTLS_CHECK_RETURN_CRITICAL
 static int ssl_transform_aead_dynamic_iv_is_explicit(
     mbedtls_ssl_transform const *transform)
@@ -914,7 +915,8 @@ hmac_failed_etm_disabled:
 
 #if defined(MBEDTLS_GCM_C) || \
     defined(MBEDTLS_CCM_C) || \
-    defined(MBEDTLS_CHACHAPOLY_C)
+    defined(MBEDTLS_CHACHAPOLY_C) || \
+    defined(MBEDTLS_ASCON_C)
     if (ssl_mode == MBEDTLS_SSL_MODE_AEAD) {
         unsigned char iv[12];
         unsigned char *dynamic_iv;
@@ -1318,7 +1320,8 @@ int mbedtls_ssl_decrypt_buf(mbedtls_ssl_context const *ssl,
 #endif /* MBEDTLS_SSL_SOME_SUITES_USE_STREAM */
 #if defined(MBEDTLS_GCM_C) || \
     defined(MBEDTLS_CCM_C) || \
-    defined(MBEDTLS_CHACHAPOLY_C)
+    defined(MBEDTLS_CHACHAPOLY_C) || \
+    defined(MBEDTLS_ASCON_C)
     if (ssl_mode == MBEDTLS_SSL_MODE_AEAD) {
         unsigned char iv[12];
         unsigned char *dynamic_iv;

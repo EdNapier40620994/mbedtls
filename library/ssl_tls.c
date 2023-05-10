@@ -2377,7 +2377,8 @@ static mbedtls_ssl_mode_t mbedtls_ssl_get_base_mode(
 
 #if defined(MBEDTLS_GCM_C) || \
     defined(MBEDTLS_CCM_C) || \
-    defined(MBEDTLS_CHACHAPOLY_C)
+    defined(MBEDTLS_CHACHAPOLY_C) || \
+    defined(MBEDTLS_ASCON_C)
     if (mode == MBEDTLS_MODE_GCM ||
         mode == MBEDTLS_MODE_CCM ||
         mode == MBEDTLS_MODE_CHACHAPOLY ||
@@ -8387,7 +8388,8 @@ static int ssl_tls12_populate_transform(mbedtls_ssl_transform *transform,
 
 #if defined(MBEDTLS_GCM_C) ||                           \
     defined(MBEDTLS_CCM_C) ||                           \
-    defined(MBEDTLS_CHACHAPOLY_C)
+    defined(MBEDTLS_CHACHAPOLY_C) || \
+    defined(MBEDTLS_ASCON_C)
     if (ssl_mode == MBEDTLS_SSL_MODE_AEAD) {
         size_t explicit_ivlen;
 

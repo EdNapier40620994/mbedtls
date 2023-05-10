@@ -1510,7 +1510,7 @@ static int mbedtls_cipher_aead_decrypt(mbedtls_cipher_context_t *ctx,
         ret = my_mbedtls_ascon_auth_decrypt(ctx->cipher_ctx, ilen,
                                                iv, ad, ad_len, tag, input, output);
 
-        if (ret == MBEDTLS_ERR_CHACHAPOLY_AUTH_FAILED) {
+        if (ret != 0) {
              ret = MBEDTLS_ERR_CIPHER_AUTH_FAILED;
         }
 
